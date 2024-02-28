@@ -25,8 +25,11 @@ class FileDatasource:
     def startReading(self, *args, **kwargs):
         """Метод повинен викликатись перед початком читання даних"""
         self.accelerometer_file = open(self.accelerometer_filename, 'r')
+        next(self.accelerometer_file)
         self.gps_file = open(self.gps_filename, 'r')
+        next(self.gps_file)
         self.parking_file = open(self.parking_filename, 'r')
+        next(self.parking_file)
 
     def stopReading(self, *args, **kwargs):
         """Метод повинен викликатись для закінчення читання даних"""
@@ -53,21 +56,36 @@ class FileDatasource:
 
     def _read_accelerometer_data(self) -> Accelerometer:
         csv_reader = reader(self.accelerometer_file)
-        next(csv_reader)
-        for row in csv_reader:
-            x, y, z = map(int, row)
-            return Accelerometer(x, y, z)
+        try:
+            row = next(csv_reader)
+        except StopIteration:
+            self.accelerometer_file.seek(0)
+            next(self.accelerometer_file)
+            row = next(csv_reader)
+
+        x, y, z = map(int, row)
+        return Accelerometer(x, y, z)
 
     def _read_gps_data(self) -> Gps:
         csv_reader = reader(self.gps_file)
-        next(csv_reader)
-        for row in csv_reader:
-            longitude, latitude = map(float, row)
-            return Gps(longitude, latitude)
+        try:
+            row = next(csv_reader)
+        except StopIteration:
+            self.gps_file.seek(0)
+            next(self.gps_file)
+            row = next(csv_reader)
+
+        longitude, latitude = map(float, row)
+        return Gps(longitude, latitude)
 
     def _read_parking_data(self) -> Parking:
         csv_reader = reader(self.parking_file)
-        next(csv_reader)
-        for row in csv_reader:
-            empty_count, longitude, latitude = map(float, row)
-            return Parking(int(empty_count), Gps(longitude, latitude))
+        try:
+            row = next(csv_reader)
+        except StopIteration:
+            self.parking_file.seek(0)
+            next(self.parking_file)
+            row = next(csv_reader)
+
+        empty_count, longitude, latitude = map(float, row)
+        return Parking(int(empty_count), Gps(longitude, latitude))
