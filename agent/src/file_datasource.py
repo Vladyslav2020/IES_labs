@@ -56,36 +56,18 @@ class FileDatasource:
 
     def _read_accelerometer_data(self) -> Accelerometer:
         csv_reader = reader(self.accelerometer_file)
-        try:
-            row = next(csv_reader)
-        except StopIteration:
-            self.accelerometer_file.seek(0)
-            next(self.accelerometer_file)
-            row = next(csv_reader)
-
+        row = next(csv_reader)
         x, y, z = map(int, row)
         return Accelerometer(x, y, z)
 
     def _read_gps_data(self) -> Gps:
         csv_reader = reader(self.gps_file)
-        try:
-            row = next(csv_reader)
-        except StopIteration:
-            self.gps_file.seek(0)
-            next(self.gps_file)
-            row = next(csv_reader)
-
+        row = next(csv_reader)
         longitude, latitude = map(float, row)
         return Gps(longitude, latitude)
 
     def _read_parking_data(self) -> Parking:
         csv_reader = reader(self.parking_file)
-        try:
-            row = next(csv_reader)
-        except StopIteration:
-            self.parking_file.seek(0)
-            next(self.parking_file)
-            row = next(csv_reader)
-
+        row = next(csv_reader)
         empty_count, longitude, latitude = map(float, row)
         return Parking(int(empty_count), Gps(longitude, latitude))
